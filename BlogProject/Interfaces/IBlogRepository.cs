@@ -11,5 +11,7 @@ namespace BlogProject.Interfaces
         public Task<bool> DeleteBlogAsync(int blogId);
         public Task<Blog> UpdateBlogAsync(int id, UpdateBlogDto blog);
 
+        public Task<bool> DeleteBlog(int id);
+
     }
 }

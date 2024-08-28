@@ -2,7 +2,7 @@
 
 namespace BlogProject.Dto.Blog
 {
-    public class BlogGetALLVM
+    public class BlogVM
     {
         public int BlogId { get; set; }
         public string? Title { get; set; }

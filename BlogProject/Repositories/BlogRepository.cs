@@ -68,5 +68,14 @@ namespace BlogProject.Repositories
             return blog;
         }
 
+        public async Task<bool> DeleteBlog(int id) { 
+            Blog blog = await GetBlogAsync(id);
+            if (blog == null) { 
+                return false;
+            }
+            _context.Blogs.Remove(blog);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

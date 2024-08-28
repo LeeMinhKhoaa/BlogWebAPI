@@ -38,17 +38,45 @@ namespace BlogProject.Controllers
             return Ok(cmm); // Return 200 with the created comment
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int CommentID, UpdateBlogDto commentDto) { 
+        public async Task<IActionResult> Update(int id,UpdateBlogDto commentDto) { 
             if (!ModelState.IsValid)
             {
                 BadRequest(commentDto);
             }    
-            Comment comment = await _commentRepository.GetComment(CommentID);
+            Comment comment = await _commentRepository.GetComment(id);
             if (comment == null) {
                 NotFound();
             }
-            Comment cmm = await _commentRepository.update(CommentID, commentDto); // Assuming `create` is an async method
+            Comment cmm = await _commentRepository.update(id, commentDto); // Assuming `create` is an async method
             return Ok(cmm); // Return 200 with the created comment
+        }
+        [HttpGet("{BlogID}")]
+        public async Task<IActionResult> GetAllCommentByBlog(int BlogID) {
+            Blog blog = await _blogRepository.GetBlogAsync(BlogID);
+            if (blog == null) { 
+                return NotFound();
+            }
+            IEnumerable<Comment> comments = _commentRepository.GetAllByBlog(BlogID);
+            var commentsViewModels = comments.Select(comment => new CommentVM
+            {
+                CommentID = comment.CommentID,
+                Content = comment.Content,
+                CreatedDate = comment.CreatedDate,
+                UpdatedDate = comment.UpdatedDate
+            }).ToList();
+            return Ok(commentsViewModels);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            Comment comment = await _commentRepository.GetComment(id);
+            if (comment == null)
+                return NotFound();
+            bool result = await _commentRepository.Delete(id);
+            if (result)
+                return Ok("Comment with id : " + id + " was deleted");
+            else
+                return BadRequest();
         }
     }
 }

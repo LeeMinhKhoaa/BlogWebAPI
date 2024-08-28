@@ -22,7 +22,7 @@ namespace BlogProject.Controllers
         public async Task<IActionResult> Index()
         {
             var lst_book = await _blogRepository.GetBlogsAsync();
-            var blogViewModels = lst_book.Select(blog => new BlogGetALLVM
+            var blogViewModels = lst_book.Select(blog => new BlogVM
             {
                 BlogId = blog.BlogId,
                 Title = blog.Title,
@@ -61,7 +61,14 @@ namespace BlogProject.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateBlogDto Updatedto) {
             Blog blog = await _blogRepository.UpdateBlogAsync(id, Updatedto);
-            return blog == null ? NotFound():Ok(blog);
+            return blog == null ? NotFound():Ok(new BlogVM()
+            {
+                BlogId = blog.BlogId,
+                Content = blog.Content,
+                CreatedAt = blog.CreatedAt,
+                LastUpdate = blog.LastUpdate,
+                Title = blog.Title,
+            });
         }
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateBlog blog) {
@@ -72,9 +79,27 @@ namespace BlogProject.Controllers
             else
             {
                 Blog newblog = await _blogRepository.CreateBlogAsync(blog);
-                return Ok(newblog);
+                return Ok(new BlogVM(){ 
+                    BlogId = newblog.BlogId,
+                    Content = newblog.Content,
+                    CreatedAt = newblog.CreatedAt,
+                    LastUpdate = newblog.LastUpdate,
+                    Title = newblog.Title,
+                });
             }
             return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id) { 
+            Blog blog = await _blogRepository.GetBlogAsync(id);
+            if (blog == null)
+                return NotFound();
+            bool result = await _blogRepository.DeleteBlogAsync(id);
+            if (result)
+                return Ok("Blog with id : " + id + " was deleted");
+            else
+                return BadRequest();
         }
     }
 }

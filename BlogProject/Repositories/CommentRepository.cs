@@ -46,5 +46,21 @@ namespace BlogProject.Repositories
             }
             return comment;
         }
+
+        public IEnumerable<Comment> GetAllByBlog(int BlogId) { 
+            IEnumerable<Comment> comments = _context.Comments.Where(c => c.BlogID == BlogId);
+            return comments;
+        }
+
+        public async Task<bool> Delete(int CommentID) {
+            Comment comment = await GetComment(CommentID);
+            if (comment == null)
+            {
+                return false;
+            }
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
